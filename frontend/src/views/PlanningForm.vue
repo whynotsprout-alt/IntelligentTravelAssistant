@@ -29,21 +29,22 @@
         <input v-model.number="form.party_size" type="number" min="1" max="20" />
       </label>
       <p v-if="error" class="error">{{ error }}</p>
-      <button type="submit" class="btn" :disabled="loading">
-        {{ loading ? "规划中…" : "生成行程" }}
-      </button>
+      <a-button type="primary" html-type="submit" :loading="loading">
+        生成行程
+      </a-button>
     </form>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
-import { useRouter } from "vue-router";
 import { planTrip } from "@/services/api";
 import { setLastPlan } from "@/services/planState";
 import type { TripPlanRequest } from "@/types/trip";
 
-const router = useRouter();
+const emit = defineEmits<{
+  planned: [];
+}>();
 const loading = ref(false);
 const error = ref("");
 
@@ -78,7 +79,7 @@ async function onSubmit() {
     };
     const plan = await planTrip(body);
     setLastPlan(plan);
-    await router.push({ name: "result" });
+    emit("planned");
   } catch (e) {
     error.value = e instanceof Error ? e.message : "请求失败";
   } finally {
@@ -121,20 +122,6 @@ input {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
-}
-.btn {
-  margin-top: 0.25rem;
-  padding: 0.65rem 1rem;
-  border: none;
-  border-radius: 8px;
-  background: #2563eb;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-}
-.btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
 }
 .error {
   color: #b91c1c;

@@ -5,13 +5,29 @@
       <p class="subtitle">Vue3 · FastAPI · HelloAgents</p>
     </header>
     <main class="main">
-      <RouterView />
+      <PlanningForm v-if="!hasPlan" @planned="hasPlan = true" />
+      <ResultView v-else @reset="onReset" />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { RouterView } from "vue-router";
+import { computed, ref } from "vue";
+import PlanningForm from "@/views/PlanningForm.vue";
+import ResultView from "@/views/ResultView.vue";
+import { clearLastPlan, getLastPlan } from "@/services/planState";
+
+const hasPlan = ref(Boolean(getLastPlan()));
+const planExists = computed(() => Boolean(getLastPlan()));
+
+if (!planExists.value) {
+  hasPlan.value = false;
+}
+
+function onReset() {
+  clearLastPlan();
+  hasPlan.value = false;
+}
 </script>
 
 <style scoped>

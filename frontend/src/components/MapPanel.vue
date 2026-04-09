@@ -1,10 +1,8 @@
 <template>
   <section class="map-card">
     <h3>地图可视化</h3>
-    <p class="hint">
-      此处接入高德 JS API / Leaflet，展示 <code>map_points</code> 坐标与路线。
-    </p>
-    <div class="map-placeholder" role="img" aria-label="地图占位">
+    <p class="hint">已接入高德 JS API Loader；未配置 key 时自动回退为坐标列表。</p>
+    <div ref="mapEl" class="map-placeholder" role="img" aria-label="地图占位">
       <ul>
         <li v-for="p in points" :key="p.name">
           {{ p.name }} — {{ p.lng.toFixed(4) }}, {{ p.lat.toFixed(4) }}
@@ -16,11 +14,55 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref, watch } from "vue";
+import { ensureAmapLoaded } from "@/services/amapLoader";
 import type { MapPoint } from "@/types/trip";
 
-defineProps<{
+const props = defineProps<{
   points: MapPoint[];
 }>();
+
+const mapEl = ref<HTMLElement | null>(null);
+let amapMap: any = null;
+let markerList: any[] = [];
+
+function drawMarkers(points: MapPoint[]) {
+  if (!amapMap || !window.AMap) return;
+  markerList.forEach((m) => amapMap.remove(m));
+  markerList = points.map(
+    (p) =>
+      new window.AMap.Marker({
+        position: [p.lng, p.lat],
+        title: p.name,
+      }),
+  );
+  markerList.forEach((m) => amapMap.add(m));
+  if (markerList.length) {
+    amapMap.setFitView(markerList);
+  }
+}
+
+onMounted(async () => {
+  if (!mapEl.value) return;
+  try {
+    const AMap = await ensureAmapLoaded();
+    amapMap = new AMap.Map(mapEl.value, {
+      zoom: 11,
+      center: props.points[0] ? [props.points[0].lng, props.points[0].lat] : [116.397428, 39.90923],
+    });
+    drawMarkers(props.points);
+  } catch {
+    // fallback list already visible in template
+  }
+});
+
+watch(
+  () => props.points,
+  (next) => {
+    drawMarkers(next);
+  },
+  { deep: true },
+);
 </script>
 
 <style scoped>
@@ -54,6 +96,7 @@ code {
   padding: 1rem;
   font-size: 0.9rem;
   color: #334155;
+  overflow: hidden;
 }
 ul {
   margin: 0;

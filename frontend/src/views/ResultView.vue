@@ -1,13 +1,13 @@
 <template>
   <div v-if="!plan" class="card empty">
     <p>暂无结果，请从首页提交规划。</p>
-    <RouterLink to="/" class="link">返回表单</RouterLink>
+    <a-button type="link" class="link-btn" @click="emit('reset')">返回表单</a-button>
   </div>
   <div v-else class="layout">
     <section class="card">
       <header class="result-head">
         <h2>{{ plan.destination }}</h2>
-        <RouterLink to="/" class="link">重新规划</RouterLink>
+        <a-button type="link" class="link-btn" @click="emit('reset')">重新规划</a-button>
       </header>
       <p class="summary">{{ plan.summary }}</p>
       <h3>每日行程</h3>
@@ -41,18 +41,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { computed } from "vue";
 import MapPanel from "@/components/MapPanel.vue";
 import { getLastPlan } from "@/services/planState";
 import type { TripPlanResponse } from "@/types/trip";
 
-const router = useRouter();
+const emit = defineEmits<{
+  reset: [];
+}>();
 const plan = computed<TripPlanResponse | null>(() => getLastPlan());
-
-onMounted(() => {
-  if (!getLastPlan()) router.replace({ name: "plan" });
-});
 </script>
 
 <style scoped>
@@ -114,12 +111,10 @@ h3 {
   color: #94a3b8;
   font-size: 0.9rem;
 }
-.link {
-  color: #2563eb;
-  text-decoration: none;
-  font-size: 0.9rem;
+.link-btn {
+  font-size: 0.9rem !important;
 }
-.link:hover {
+.link-btn:hover {
   text-decoration: underline;
 }
 </style>

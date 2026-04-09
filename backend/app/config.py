@@ -16,11 +16,16 @@ class Settings(BaseSettings):
     debug: bool = False
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
-    # External APIs (set via environment)
-    amap_api_key: str = ""
+    # AMap keys
+    amap_web_service_key: str = ""
+    amap_js_api_key: str = ""
+
+    # External APIs
     unsplash_access_key: str = ""
     llm_api_key: str = ""
+    llm_provider: str = "openai"  # openai | deepseek | compatible
     llm_base_url: str = ""
+    llm_model: str = "gpt-4o-mini"
 
 
 @lru_cache

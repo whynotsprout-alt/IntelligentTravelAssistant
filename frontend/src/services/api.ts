@@ -1,22 +1,18 @@
 import type { TripPlanRequest, TripPlanResponse } from "@/types/trip";
+import axios from "axios";
 
-const BASE = "/api/v1";
+const BASE = import.meta.env.VITE_API_BASE_URL || "/api/v1";
+const client = axios.create({
+  baseURL: BASE,
+  timeout: 15000,
+});
 
 export async function planTrip(body: TripPlanRequest): Promise<TripPlanResponse> {
-  const res = await fetch(`${BASE}/trips/plan`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `HTTP ${res.status}`);
-  }
-  return res.json() as Promise<TripPlanResponse>;
+  const { data } = await client.post<TripPlanResponse>("/trip/plan", body);
+  return data;
 }
 
 export async function healthCheck(): Promise<{ status: string }> {
-  const res = await fetch(`${BASE}/health`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json() as Promise<{ status: string }>;
+  const { data } = await client.get<{ status: string }>("/health");
+  return data;
 }

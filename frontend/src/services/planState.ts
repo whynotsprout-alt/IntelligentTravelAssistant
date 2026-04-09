@@ -9,3 +9,7 @@ export function setLastPlan(plan: TripPlanResponse): void {
 export function getLastPlan(): TripPlanResponse | null {
   return last;
 }
+
+export function clearLastPlan(): void {
+  last = null;
+}
