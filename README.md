@@ -61,6 +61,10 @@ helloagents-trip-planner/
 
 ## Run
 
+配置说明（密钥获取与填写）：
+
+- 见 `docs/CONFIGURATION.md`
+
 Backend:
 
 ```bash
