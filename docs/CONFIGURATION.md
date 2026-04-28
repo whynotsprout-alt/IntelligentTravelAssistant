@@ -17,9 +17,10 @@
 
 按需填写（取决于所用模型服务商）：
 
-- `LLM_PROVIDER`：默认 `openai`
+- `LLM_PROVIDER`：可选；不填时自动识别
 - `LLM_BASE_URL`：兼容 OpenAI 协议服务时常需指定
-- `LLM_MODEL`：模型名（如 `gpt-4o-mini`）
+- `LLM_MODEL`：模型名（如 `gpt-5.4`）
+- `LLM_TIMEOUT`：模型请求超时（秒），建议 `120`
 - `AMAP_JS_API_KEY`：可选，仅用于记录前端 JS Key（后端当前不使用）
 
 ### 前端（`frontend/.env`）
@@ -84,8 +85,9 @@ AMAP_JS_API_KEY=你的高德JSKey(可选)
 UNSPLASH_ACCESS_KEY=你的UnsplashAccessKey(建议)
 LLM_API_KEY=你的LLM密钥
 LLM_PROVIDER=openai
-LLM_BASE_URL=
-LLM_MODEL=gpt-4o-mini
+LLM_BASE_URL=https://你的兼容服务/v1
+LLM_MODEL=gpt-5.4
+LLM_TIMEOUT=120
 ```
 
 ### 3.2 前端配置
@@ -111,6 +113,9 @@ VITE_AMAP_WEB_JS_KEY=你的高德JSKey
 - 前端：
   - `VITE_API_BASE_URL` 指向可访问后端
   - `VITE_AMAP_WEB_JS_KEY` 已填
+- 导出相关：
+  - 后端 `/api/v1/map/static-map-image` 可访问
+  - 高德 `AMAP_API_KEY` 有效（导出地图依赖）
 - 本地端口：
   - 后端 `8000`
   - 前端 `5173`
@@ -132,3 +137,8 @@ VITE_AMAP_WEB_JS_KEY=你的高德JSKey
 - **接口 404**
   - 前端应请求 `/api/v1/...`
   - `VITE_API_BASE_URL` 应指向后端根地址（不带 `/api`）
+
+- **导出时地图空白 / 仅有标点**
+  - 已默认使用后端静态地图图片接口：`/api/v1/map/static-map-image`
+  - 先确认后端已重启并加载最新代码
+  - 检查 `AMAP_API_KEY` 是否有效、是否有调用额度限制
